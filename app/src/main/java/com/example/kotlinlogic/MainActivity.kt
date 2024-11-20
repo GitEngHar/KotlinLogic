@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.kotlinlogic.ui.theme.KotlinLogicTheme
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,18 +62,40 @@ class MyInfomation(var myName:String,var myAnimalTitleLength:Int,var myGeneratio
     }
 }
 
+class LoveAnimalParams(
+    initialValue: Int, //メモリに保持する値 パッキングフィールドで保持する
+    private val minParam: Int,
+    private val maxParam: Int
+    ) : ReadWriteProperty<Any?, Int> {
+        var fieldData = initialValue
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+        // fieldの値をゲットする
+        return fieldData
+    }
+
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+        if (value in minParam..maxParam){
+            // value の値が 最小最大の範囲内であれば field にセットする
+            fieldData = value
+        }
+    }
+
+    }
 
 @Composable
 fun Greeting(name: String, animalTitleLength: Int,generation: String, modifier: Modifier = Modifier) {
     val myHumanInfomation = MyInfomation(name,animalTitleLength,generation);
-    myHumanInfomation.pluslovesAnimalParam()
+    var loveParams by LoveAnimalParams(initialValue = 10,minParam=0,maxParam=100)
+
+
     Column(){
         Text(
             text = "Hello ${myHumanInfomation.name}!", //クラス内の値をgetで表示
             modifier = modifier
         )
         Text(
-            text = "lovesAnimalParam ${myHumanInfomation.lovesAnimalParam}",
+            text = "lovesAnimalParam ${loveParams}",
             modifier = modifier
         )
         Text(
