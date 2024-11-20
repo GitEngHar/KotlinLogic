@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = "Android",
-                        animalLength = 10,
+                        animalTitleLength = 10,
                         generation = "teens",
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -33,19 +33,49 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+open class HumanInfomation(var name: String, var generation: String){
+    open var lovesAnimalParam = 0
+        set(value){
+            if (value in 0..100){
+                field = value
+            }
+        }
+    constructor(name: String,animalTitleLength: Int, generation: String) : this(name,generation){
+        when(animalTitleLength){
+            in 1..10 -> lovesAnimalParam = 10
+            else -> lovesAnimalParam = -10
+        }
+    }
+    open fun pluslovesAnimalParam(){
+        lovesAnimalParam ++
+    }
+}
+
+class MyInfomation(var myName:String,var myAnimalTitleLength:Int,var myGeneration: String) :
+    HumanInfomation(name = myName,animalTitleLength = myAnimalTitleLength, generation = myGeneration){
+    override fun pluslovesAnimalParam() {
+        super.pluslovesAnimalParam()
+        super.lovesAnimalParam +=10
+    }
+}
+
+
 @Composable
-fun Greeting(name: String, animalLength: Int,generation: String, modifier: Modifier = Modifier) {
+fun Greeting(name: String, animalTitleLength: Int,generation: String, modifier: Modifier = Modifier) {
+    val myHumanInfomation = MyInfomation(name,animalTitleLength,generation);
+    myHumanInfomation.pluslovesAnimalParam()
     Column(){
         Text(
-            text = "Hello $name!",
+            text = "Hello ${myHumanInfomation.name}!", //クラス内の値をgetで表示
             modifier = modifier
         )
         Text(
-            text = "Favorite AniName Length $animalLength",
+            text = "lovesAnimalParam ${myHumanInfomation.lovesAnimalParam}",
             modifier = modifier
         )
         Text(
-            text = "Your $generation",
+            text = "Your ${myHumanInfomation.generation}",
             modifier = modifier
         )
 
@@ -53,12 +83,15 @@ fun Greeting(name: String, animalLength: Int,generation: String, modifier: Modif
 
 }
 
+
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     val userName : String = judgeType("man")
     val userGeneration = judgeGeneration(25)
     val favoriteAnimaltext : String? = "aa"
+
     /*
     * nullを明示的に否定する
     * nullの場合でも lengthは実行されるため nullpointer エラーになる
